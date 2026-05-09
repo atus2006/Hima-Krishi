@@ -9,7 +9,8 @@
     "dev": "nodemon index.js",
     "test": "node quick-test.js",
     "dev:web": "next dev",
-    "build:web": "next build"
+    "build:web": "next build",
+    "build": "next build"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.26.0",
