@@ -1,5 +1,6 @@
 // globals CSS inlined to avoid PostCSS processing in dev
 import React from 'react'
+import './globals.css'
 
 export const metadata = {
   title: 'Hima Krishi',
@@ -9,18 +10,7 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <head>
-        {/* Tailwind CDN for local dev (avoids PostCSS build) */}
-        <script src="https://cdn.tailwindcss.com"></script>
-        <style>{`
-          :root{--primary:#2C7A4B;--darkgreen:#1A3C2E;--gold:#C8991A}
-          html,body,#__next{height:100%}
-          body{margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;background:#fff;color:#0f172a}
-          .bg-primary{background-color:var(--primary)!important}.text-primary{color:var(--primary)!important}
-          .bg-darkgreen{background-color:var(--darkgreen)!important}.bg-gold{background-color:var(--gold)!important}
-          .badge-green{background-color:var(--primary);color:#fff;padding:0.25rem 0.5rem;border-radius:0.375rem;font-size:0.75rem}
-        `}</style>
-      </head>
+      <head />
       <body>{children}</body>
     </html>
   )
