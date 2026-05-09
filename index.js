@@ -29,19 +29,29 @@ function escapeXml(s) {
 
 function validateTwilioRequest(req, authToken) {
   try {
-    const signature = req.get('X-Twilio-Signature') || req.get('x-twilio-signature');
-    if (!signature) return false;
-    // full URL used by Twilio
-    const url = (req.protocol + '://' + req.get('host') + req.originalUrl).replace(/:\d+/, match => match);
-    // Build string: url + sorted params concatenated
-    const params = req.body || {};
+    const signatureHeader = req.get('X-Twilio-Signature') || req.get('x-twilio-signature');
+    if (!signatureHeader) return false;
+
+    // Build the absolute URL Twilio used (including host)
+    const url = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
+
+    // Build the string: url + sorted parameter name+value pairs
+    const params = req.body && typeof req.body === 'object' ? req.body : {};
     const keys = Object.keys(params).sort();
     let data = url;
     for (const k of keys) {
-      data += k + params[k];
+      const v = params[k] === undefined || params[k] === null ? '' : params[k];
+      data += String(k) + String(v);
     }
-    const computed = crypto.createHmac('sha1', authToken).update(data).digest('base64');
-    return crypto.timingSafeEqual(Buffer.from(computed), Buffer.from(signature));
+
+    // Compute expected signature (base64)
+    const expected = crypto.createHmac('sha1', authToken).update(data).digest('base64');
+
+    // Compare buffers safely (both are base64 encoded strings)
+    const sigBuf = Buffer.from(signatureHeader, 'base64');
+    const expBuf = Buffer.from(expected, 'base64');
+    if (sigBuf.length !== expBuf.length) return false;
+    return crypto.timingSafeEqual(sigBuf, expBuf);
   } catch (err) {
     console.error('Twilio validation error', err);
     return false;
@@ -63,8 +73,18 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 
-const sessions = new Map(); // phone -> { step, data }
+const sessions = new Map(); // phone -> { step, data, updatedAt }
 const qrStore = new Map(); // id -> { buffer, contentType }
+
+// Session garbage collector: remove sessions older than 60 minutes
+const SESSION_TTL_MS = 1000 * 60 * 60; // 60 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [phone, sess] of sessions.entries()) {
+    const updated = sess && sess.updatedAt ? sess.updatedAt : 0;
+    if (now - updated > SESSION_TTL_MS) sessions.delete(phone);
+  }
+}, 1000 * 60 * 10); // run every 10 minutes
 
 const BASE_URL = process.env.BASE_URL || null;
 
@@ -94,7 +114,7 @@ app.post('/webhook', async (req, res) => {
       }
     }
     const from = req.body.From || req.body.from;
-    const body = (req.body.Body || req.body.Body || '').trim();
+    const body = String(req.body.Body || req.body.body || '').trim();
     if (!from) {
       return res.status(400).type('text').send('Missing From');
     }
@@ -104,7 +124,7 @@ app.post('/webhook', async (req, res) => {
 
     if (!session) {
       // start new session and ask first question
-      session = { step: 0, data: {} };
+      session = { step: 0, data: {}, updatedAt: Date.now() };
       sessions.set(phone, session);
       const xml = buildTwiml([{ body: questions[0] }]);
       res.type('text/xml').send(xml);
@@ -124,6 +144,7 @@ app.post('/webhook', async (req, res) => {
         session.data[field] = body;
       }
       session.step = step + 1;
+      session.updatedAt = Date.now();
     }
 
     if (session.step < questions.length) {
