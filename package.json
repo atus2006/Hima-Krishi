@@ -1,0 +1,35 @@
+{
+  "name": "himakrishi-whatsapp-bot",
+  "version": "1.0.0",
+  "description": "WhatsApp bot webhook for Hima Krishi using Twilio and Supabase",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "start:web": "next start",
+    "dev": "nodemon index.js",
+    "test": "node quick-test.js",
+    "dev:web": "next dev",
+    "build:web": "next build"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.26.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "next": "^14.0.0",
+    "pg": "^8.20.0",
+    "qrcode": "^1.5.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "twilio": "^4.23.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.2.4",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "autoprefixer": "^10.4.0",
+    "nodemon": "^2.0.22",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}
