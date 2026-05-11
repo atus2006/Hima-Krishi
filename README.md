@@ -85,10 +85,9 @@ npx ngrok http 3000
 # paste the ngrok HTTPS URL into Twilio sandbox webhook settings
 ```
 
-Render/Vercel
+Render
 
-- `Render` start command: `node index.js` (webhook).
-- Deploy Next.js app to Vercel and set `NEXT_PUBLIC_APP_URL` to your deployed URL.
+- `Render` start command: `node index.js` (webhook). Use `NEXT_PUBLIC_APP_URL` (your frontend URL) when configuring the backend.
 
 # Hima-Krishi
 

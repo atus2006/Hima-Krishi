@@ -3,7 +3,7 @@
 - Do NOT commit your `SUPABASE_SERVICE_ROLE_KEY` or any service role / admin keys to source control.
 - Use your hosting platform's secret manager to store `SUPABASE_SERVICE_ROLE_KEY` and other secrets:
   - Render: Dashboard -> Environment -> Add Secret (key: `SUPABASE_SERVICE_ROLE_KEY`)
-  - Vercel: Project Settings -> Environment Variables (add as `SUPABASE_SERVICE_ROLE_KEY`)
+  - Netlify: Site Settings -> Build & deploy -> Environment -> add variable (key: `SUPABASE_SERVICE_ROLE_KEY`)
   - GitHub Actions: Repository -> Settings -> Secrets -> Actions -> add secret
 
 - For local development, keep a private `.env.local` (ignored by `.gitignore`) and never push it. Prefer using a local secret store.

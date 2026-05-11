@@ -31,7 +31,8 @@ async function uploadFileIo(buffer, filename) {
   try {
     const recipient = 'whatsapp:+918847812836';
     const farmerId = 'qr-fileio-' + Date.now();
-    const farmUrl = `https://himakrishi.vercel.app/farm/${farmerId}`;
+    const BASE = process.env.NEXT_PUBLIC_APP_URL || process.env.BASE_URL || 'http://localhost:3001';
+    const farmUrl = `${BASE.replace(/\/$/, '')}/farm/${farmerId}`;
     console.log('Generating QR for', farmUrl);
     const png = await QRCode.toBuffer(farmUrl, { errorCorrectionLevel: 'H', width: 300, type: 'png' });
 
